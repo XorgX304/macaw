@@ -26,13 +26,11 @@ steps:
     export PATH=$HOME/.local/bin:$PATH
     curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
   displayName: 'Install travis'
-- script: |
-    export STACK_YAML=$(stackage)
-    stack --no-terminal setup
+- script: stack --stack-yaml=$(stackage) --no-terminal setup
   displayName: 'Install GHC'
-- script: stack build --ghc-options="-Wall -Werror"
+- script: stack --stack-yaml=$(stackage) build --ghc-options="-Wall -Werror"
   displayName: 'Build packages'
-- script: stack test macaw-x86 macaw-x86-symbolic --ghc-options="-Wall -Werror"
+- script: stack --stack-yaml=$(stackage) test macaw-x86 macaw-x86-symbolic --ghc-options="-Wall -Werror"
   displayName: 'Run tests'
-- script: stack haddock
+- script: stack --stack-yaml=$(stackage) haddock
   displayName: 'Build documentation'
