@@ -1,0 +1,35 @@
+trigger:
+- *
+pr:
+- master
+
+strategy:
+  matrix:
+  ghc-8.6:
+    stackage: stack-8.6.yaml
+  ghc-8.4:
+    stackage: stack-8.4.yaml
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- displayName: 'Checkout submodules'
+  script: |
+    # Replace ssh with https
+    sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+    # Get submodules
+    git submodule update --init
+- displayName: 'Install travis'
+  script: |
+    mkdir -p $HOME/.local/bin
+    export PATH=$HOME/.local/bin:$PATH
+    travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+- displayName: 'Install GHC'
+  script: travis_wait stack --no-terminal setup
+- displayName: 'Build packages'
+  script: stack build --ghc-options="-Wall -Werror"
+- displayName: 'Run tests'
+  script: stack test macaw-x86 macaw-x86-symbolic --ghc-options="-Wall -Werror"
+- displayName: 'Build documentation'
+  script: stack haddock
