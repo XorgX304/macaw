@@ -1,14 +1,15 @@
 trigger:
 - *
+
 pr:
 - master
 
 strategy:
   matrix:
-  ghc-8.6:
-    stackage: stack-8.6.yaml
-  ghc-8.4:
-    stackage: stack-8.4.yaml
+    ghc-8.6:
+      stackage: stack-8.6.yaml
+    ghc-8.4:
+      stackage: stack-8.4.yaml
 
 pool:
   vmImage: 'ubuntu-latest'
