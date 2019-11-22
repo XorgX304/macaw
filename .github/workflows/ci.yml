@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # NOTE: must list all targets in `include` here to activate them
+        os: [ubuntu-18.04]
+        stack: [stack-8.4.yaml stack-8.6.yaml]
+      # complete all jobs
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Checkout submodules
+        run: |
+          # Replace ssh with https
+          sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+          # Get submodules
+          git submodule update --init
+      - name: Install travis
+        run: |
+          mkdir -p $HOME/.local/bin
+          export PATH=$HOME/.local/bin:$PATH
+          travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+      - name: Install GHC
+        run: travis_wait stack --no-terminal setup
+      - name: Build packages
+        run: stack build --ghc-options="-Wall -Werror"
+      - name: Run tests
+        run: stack test macaw-x86 macaw-x86-symbolic --ghc-options="-Wall -Werror"
+      - name: Build documentation
+        run: stack haddock
