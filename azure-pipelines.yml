@@ -28,7 +28,7 @@ steps:
   displayName: 'Install travis'
 - script: |
     export STACK_YAML=$(stackage)
-    travis_wait stack --no-terminal setup
+    stack --no-terminal setup
   displayName: 'Install GHC'
 - script: stack build --ghc-options="-Wall -Werror"
   displayName: 'Build packages'
