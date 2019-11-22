@@ -26,7 +26,9 @@ steps:
     export PATH=$HOME/.local/bin:$PATH
     travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 - displayName: 'Install GHC'
-  script: travis_wait stack --no-terminal setup
+  script: |
+    export STACK_YAML=$(stackage)
+    travis_wait stack --no-terminal setup
 - displayName: 'Build packages'
   script: stack build --ghc-options="-Wall -Werror"
 - displayName: 'Run tests'
